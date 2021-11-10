@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
 	"gitlab.com/jdb.com.la/sdk-go"
@@ -49,6 +50,7 @@ var (
 	PGDSN         = fmt.Sprintf("user='%s' password='%s' host='%s' port=%s dbname='%s' sslmode=disable options='%s'",
 		PGUSER, PGPASSWORD, PGHOST, PGPORT, PGDATABASE, timeoutOption)
 )
+
 
 func main() {
 	if err := excute(); err != nil {
@@ -122,3 +124,4 @@ func newEchoServer() *echo.Echo {
 	e.HideBanner = true
 	return e
 }
+

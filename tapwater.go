@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 
 	"github.com/jmoiron/sqlx"
@@ -17,4 +18,10 @@ var ErrPermissionDenied = errors.New("permission denied")
 type AquaService struct {
 	db       *sqlx.DB
 	aqClient *sdk.Client
+}
+
+type Province = sdk.Province
+
+func (aq *AquaService) GetProvince(ctx context.Context) ([]Province, error) {
+	return aq.aqClient.Provinces(ctx)
 }
