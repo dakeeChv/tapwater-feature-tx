@@ -57,7 +57,17 @@ var StatusNoInfo = func() *status.Status {
 		WithDetails(
 			&edpb.ResourceInfo{
 				ResourceType: "BILL INFO",
-				ResourceName: "[google.rpc.Code.INVALID_ARGUMENT]",
+				ResourceName: "[google.rpc.Code.NotFound]",
+			})
+	return s
+}()
+
+var StatusDenyCcy = func() *status.Status {
+	s, _ := status.New(codes.FailedPrecondition, "info not found.").
+		WithDetails(
+			&edpb.BadRequest_FieldViolation{
+				Field:       "Account['currency']",
+				Description: "must be LAK only for this bill",
 			})
 	return s
 }()
@@ -70,6 +80,8 @@ func gRPCStatusFromErr(err error) *status.Status {
 		return StatusPermissionDenied
 	case errors.Is(err, ErrNoInfo):
 		return StatusNoInfo
+	case errors.Is(err, ErrNotAllowCcy):
+		return StatusDenyCcy
 	}
 
 	return status.New(codes.Internal, "Internal Server Error")
