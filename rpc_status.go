@@ -52,12 +52,12 @@ var StatusPermissionDenied = func() *status.Status {
 	return s
 }()
 
-var StatusNoCustomer = func() *status.Status {
-	s, _ := status.New(codes.NotFound, "customer not found.").
+var StatusNoInfo = func() *status.Status {
+	s, _ := status.New(codes.NotFound, "info not found.").
 		WithDetails(
 			&edpb.ResourceInfo{
-				ResourceType: "CUSTOMER",
-				ResourceName: "[google.rpc.Code.PERMISSION_DENIED]",
+				ResourceType: "BILL INFO",
+				ResourceName: "[google.rpc.Code.INVALID_ARGUMENT]",
 			})
 	return s
 }()
@@ -68,8 +68,8 @@ func gRPCStatusFromErr(err error) *status.Status {
 		return status.New(codes.OK, "OK")
 	case errors.Is(err, ErrPermissionDenied):
 		return StatusPermissionDenied
-	case errors.Is(err, ErrNoCustomer):
-		return StatusNoCustomer
+	case errors.Is(err, ErrNoInfo):
+		return StatusNoInfo
 	}
 
 	return status.New(codes.Internal, "Internal Server Error")
