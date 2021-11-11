@@ -8,8 +8,8 @@ import (
 	sdk "gitlab.com/jdb.com.la/sdk-go/billing/tapwater"
 )
 
-// ErrNoCustomer is returned when the customer info is not found
-var ErrNoCustomer = errors.New("no customer info")
+// ErrNoInfo is returned when no info is found.
+var ErrNoInfo = errors.New("no info")
 
 // ErrPermissionDenied is returned when the user
 // does not have permission to perform the action.
@@ -21,7 +21,20 @@ type AquaService struct {
 }
 
 type Province = sdk.Province
+type InfoQuery = sdk.InfoQuery
+type Info = sdk.Info
 
-func (aq *AquaService) GetProvince(ctx context.Context) ([]Province, error) {
+func (aq *AquaService) Province(ctx context.Context) ([]Province, error) {
 	return aq.aqClient.Provinces(ctx)
+}
+
+func (aq *AquaService) Info(ctx context.Context, in InfoQuery) (Info, error) {
+	info, err := aq.aqClient.Info(ctx, in)
+	if err != nil {
+		if err.Error() != "" {
+			return Info{}, ErrNoInfo
+		}
+		return Info{}, err
+	}
+	return info, nil
 }
