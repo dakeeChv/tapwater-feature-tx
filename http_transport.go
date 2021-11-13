@@ -23,8 +23,8 @@ func (h *HTTPTransport) Province(c echo.Context) error {
 }
 
 func (h *HTTPTransport) Info(c echo.Context) error {
-	var in InfoQuery
-	if err := c.Bind(&in); err != nil {
+	var in InfoRequest
+	if err := c.Bind(&in); err != nil || in.Validate() != nil {
 		hs := httpStatusPbFromRPC(StatusBindingFailure)
 		b, _ := protojson.Marshal(hs)
 		return c.JSONBlob(http.StatusOK, b)
