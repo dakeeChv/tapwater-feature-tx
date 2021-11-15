@@ -24,7 +24,7 @@ func GetEnv(key, fallback string) string {
 }
 
 var (
-	PORT = fmt.Sprintf("%s", "3333")
+	PORT = fmt.Sprintf("%s", "3334")
 	ADDR = fmt.Sprintf(":%s", PORT)
 )
 
@@ -50,7 +50,6 @@ var (
 	PGDSN         = fmt.Sprintf("user='%s' password='%s' host='%s' port=%s dbname='%s' sslmode=disable options='%s'",
 		PGUSER, PGPASSWORD, PGHOST, PGPORT, PGDATABASE, timeoutOption)
 )
-
 
 func main() {
 	if err := excute(); err != nil {
@@ -83,6 +82,7 @@ func excute() error {
 	if err != nil && db.Ping() != nil {
 		return fmt.Errorf("open database failure: %v", err)
 	}
+	defer db.Close()
 
 	aqService := &AquaService{
 		db:       db,

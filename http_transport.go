@@ -23,13 +23,13 @@ func (h *HTTPTransport) Province(c echo.Context) error {
 }
 
 func (h *HTTPTransport) Info(c echo.Context) error {
-	var in InfoQuery
-	if err := c.Bind(&in); err != nil {
+	var in InfoRequest
+	if err := c.Bind(&in); err != nil || in.Validate() != nil {
 		hs := httpStatusPbFromRPC(StatusBindingFailure)
 		b, _ := protojson.Marshal(hs)
 		return c.JSONBlob(http.StatusOK, b)
 	}
-	
+
 	ctx := c.Request().Context()
 	info, err := h.aqService.Info(ctx, in)
 	if err != nil {
@@ -40,8 +40,27 @@ func (h *HTTPTransport) Info(c echo.Context) error {
 	return c.JSON(http.StatusOK, echo.Map{"info": info})
 }
 
+func (h *HTTPTransport) Tx(c echo.Context) error {
+	var in TxRequest
+	if err := c.Bind(&in); err != nil || in.Validate() != nil {
+		hs := httpStatusPbFromRPC(StatusBindingFailure)
+		b, _ := protojson.Marshal(hs)
+		return c.JSONBlob(http.StatusOK, b)
+	}
+
+	ctx := c.Request().Context()
+	tx, err := h.aqService.DoTx(ctx, in)
+	if err != nil {
+		hs := httpStatusPbFromRPC(gRPCStatusFromErr(err))
+		b, _ := protojson.Marshal(hs)
+		return c.JSONBlob(http.StatusOK, b)
+	}
+	return c.JSON(http.StatusOK, echo.Map{"tx": tx})
+}
+
 func (h *HTTPTransport) install(e *echo.Echo) {
 	v1 := e.Group("/v1/billing/tapwater")
 	v1.POST("/provinces", h.Province)
 	v1.POST("/info", h.Info)
+	v1.POST("/payment", h.Tx)
 }
